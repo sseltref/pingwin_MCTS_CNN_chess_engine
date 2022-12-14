@@ -16,8 +16,5 @@ if side == "yes":
     move = input("Input your move: ")
     move = chess.Move.from_uci(move)
     initboard.push(move)
-    mirror = False
-else:
-    mirror = True
 chess_game = pingwin_game(exploration_constant=float(settings['exploration_constant']),bias_constant=float(settings['bias_constant']),n_init=int(settings['init_node_visits']),initboard=initboard,killer_rate=float(settings['killer_rate']), time_limit=time, simulation_depth=int(settings['simulation_depth']))
 chess_game.play()
