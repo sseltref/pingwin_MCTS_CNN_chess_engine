@@ -1,4 +1,4 @@
-# PINGWIN - Monte Carlo Tree Search and Convolutional Neural Networks based chess engine 
+# piNgwiN - Monte Carlo Tree Search and Convolutional Neural Networks based chess engine 
 This is an early version of my chess engine. You can play it in terminal by running pingwin.py.  
 Engine settings parameters description:  
 exploration_constant --- exploration value of MCTS,  
@@ -9,3 +9,5 @@ bias_neural_network --- agile, standard, heavy --- tells engine which CNN move b
 position_eval_neural_network --- agile, standard, heavy --- tells engine which CNN position evaluation models to use.  
     
 Moves are passed in UCI notation.
+
+# pingwin on lichess - lichess.org/@/pingwin_siepacz
