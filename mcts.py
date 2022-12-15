@@ -256,7 +256,8 @@ class mcts():
             node.minmaxReward = reward
         node_reward = node.minmaxReward
         if 1-reward < node.parent.minmaxReward or node.parent.num_children == 1:
-            self.backpropagate_minmax(node.parent, 1-reward)
+            node.minmaxReward = reward
+            return self.backpropagate_minmax(node.parent, 1-reward)
         else:
             siblings_rewards = []
             for child in node.parent.children.values():
@@ -267,8 +268,9 @@ class mcts():
                 siblings_rewards.remove(max_reward)
                 siblings_rewards.append(reward)
                 max_reward = max(siblings_rewards)
-                self.backpropagate_minmax(node.parent, 1-max_reward)
-        node.minmaxReward = reward
+                node.minmaxReward = reward
+                return self.backpropagate_minmax(node.parent, 1-max_reward)
+
 
 
 
