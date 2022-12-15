@@ -53,7 +53,7 @@ class pingwin_game:
                 self.searcher.root.parent = None
                 gc.collect()
                 return
-        self.searcher.root = treeNode(self.board, None, 0, 0,self.B)
+        self.searcher.root = treeNode(self.board, None, 0, 0)
         return
     def play(self):
         while True:

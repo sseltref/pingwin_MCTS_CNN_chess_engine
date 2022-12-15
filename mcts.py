@@ -21,7 +21,7 @@ class mcts():
         self.rollout = rolloutPolicy
         self.biasConstant = biasConstant
         self.killer_rate=killer_rate
-        self.root = treeNode(initialState, None, 0, 0,self.biasConstant)
+        self.root = treeNode(initialState, None, 0, 0)
 
     def progressbar(self, time_left, prefix="", size=30):  # Python3.3+
         def show( time_left):
@@ -64,8 +64,6 @@ class mcts():
         total_time = float(timeLimit) - float(time_start)
         i = 0
         t = 0
-        if len(list(self.root.board.legal_moves)) == 1:
-            return list(self.root.board.legal_moves)[0]
         while time.time() < timeLimit:
             r = float(timeLimit) - float(time.time())
             r = r / total_time
@@ -74,14 +72,14 @@ class mcts():
             # self.explorationConstant = self.originalExplorationConstant * r
             self.branching_factor = r
             self.executeRound()
+            if len(list(self.root.board.legal_moves)) == 1:
+                return list(self.root.board.legal_moves)[0]
 
             if t < time_spent:
                 self.bestChildVisit = self.getBestChildVisit(self.root)
                 self.bestChildLCB = self.getBestChildLCB(self.root)
                 self.print_analysis(self.root.board,timeLimit-time.time())
                 t+=1
-                variation = []
-                node = self.root
                 #while node.num_children != 0:
                     #variation.append((self.getAction(node, self.getBestChild(node,0,self.biasConstant))).uci())
                     #node = self.getBestChildVisit(node)
@@ -226,7 +224,7 @@ class mcts():
         if not bool(node.from_move_prob_dist_dict[max_prob_from_square][1]):
             del node.from_move_prob_dist_dict[max_prob_from_square]
         #initialize new node object with position of new node being position of old node that had the selected move taken. Also set a bias for the new node.
-        newNode = treeNode(node.takeAction(move), node, move_bias, self.n_init, self.biasConstant)
+        newNode = treeNode(node.takeAction(move), node, move_bias, self.n_init)
         #add new node as a children of the old node
         node.children[move] = newNode
         #set a value for the new node by simulating it
