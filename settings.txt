@@ -1,6 +1,6 @@
-exploration_constant = 1
-bias_constant = 1
-killer_rate = 0.5
+exploration_constant = 0.1
+bias_constant = 10
+killer_rate = 0
 init_node_visits = 1
 simulation_depth = 0
 bias_neural_network = heavy
