@@ -16,7 +16,14 @@ class Game():
 
 
     def invoke_engine(self,board=chess.Board()):
-        self.pingwin = pingwin_game(1, 100, 100, board, 0)
+        settings_file = 'settings.txt'
+        settings = {}
+        with open(settings_file) as f:
+            for line in f:
+                (key, val) = line.strip().split(' = ')
+                settings[key] = val
+
+        self.pingwin = pingwin_game(exploration_constant=float(settings['exploration_constant']),bias_constant=float(settings['bias_constant']),n_init=int(settings['init_node_visits']),initboard=board,killer_rate=float(settings['killer_rate']), simulation_depth=int(settings['simulation_depth']))
     def run(self):
         if self.colour == 'white':
             self.handle_state_change()
