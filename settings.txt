@@ -3,5 +3,5 @@ bias_constant = 1
 killer_rate = 0.5
 init_node_visits = 1
 simulation_depth = 0
-bias_neural_network = heavy
-position_eval_neural_network = heavy
+bias_neural_network = standard
+position_eval_neural_network = standard
