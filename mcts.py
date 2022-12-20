@@ -7,7 +7,7 @@ from node import treeNode
 from functions import *
 class mcts():
     def __init__(self, initialState, timeLimit=None, explorationConstant=math.sqrt(2),
-                 rolloutPolicy=MCMC, biasConstant=1, n_init=1, killer_rate=0.5, simulation_depth=0):
+                 rolloutPolicy=MCMC, biasConstant=1, n_init=1, killer_rate=0.5, simulation_depth=0, print_limit=5, show_variation=False):
         if timeLimit != None:
 
             self.originalExplorationConstant = explorationConstant
@@ -22,6 +22,11 @@ class mcts():
         self.biasConstant = biasConstant
         self.killer_rate=killer_rate
         self.root = treeNode(initialState, None, 0, 0)
+        self.print_limit=print_limit
+        if show_variation == "True":
+            self.show_variation = True
+        else:
+            self.show_variation=False
 
     def progressbar(self, time_left, prefix="", size=30):  # Python3.3+
         def show( time_left):
@@ -45,18 +50,25 @@ class mcts():
         print('Analyzing position...')
         self.progressbar(time_left)
         print("Best moves:")
-        if num_of_childs > 0:
-            print("1: " + childs[0][0] , childs[0][1] , childs[0][2])
-        if num_of_childs>1:
-            print("2: " + childs[1][0] , childs[1][1] , childs[1][2])
-        if num_of_childs>2:
-            print("3: " + childs[2][0] , childs[2][1] , childs[2][2])
-        if num_of_childs>3:
-            print("4: " + childs[3][0] , childs[3][1] , childs[3][2])
-        if num_of_childs>4:
-            print("5: " + childs[4][0] , childs[4][1] , childs[4][2])
+        for p in range (0,self.print_limit):
+            if num_of_childs > p:
+                print("{}: ".format(p+1) + childs[p][0] , childs[p][1] , childs[p][2])
+            else:
+                break
+
         print("Total iterations: " + str(self.root.numVisits-1))
         print("")
+        if self.show_variation == True:
+            variation = []
+            node = self.root
+            while node.num_children != 0:
+                variation.append((self.getAction(node, self.getBestChildVisit(node))))
+                node = self.getBestChildVisit(node)
+            print('Best line:')
+            for l in range(len(variation)):
+                print("{}. {}, ".format(l+1,variation[l]), end="")
+            print("")
+            print("")
     def search(self):
         subprocess.run('cls', shell=True)
         time_start = float(time.time())

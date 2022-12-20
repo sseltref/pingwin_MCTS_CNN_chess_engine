@@ -5,7 +5,7 @@ from node import treeNode
 import sys, subprocess
 
 class pingwin_game:
-    def __init__(self, exploration_constant, bias_constant,n_init,initboard,killer_rate,  time_limit=10, simulation_depth=0, mirror = False):
+    def __init__(self, exploration_constant, bias_constant,n_init,initboard,killer_rate,  time_limit=10, simulation_depth=0, mirror = False, print_limit=5, show_variation=False):
         self.moves_made=0
         self.mirror = mirror
         self.simulation_depth=simulation_depth
@@ -13,10 +13,12 @@ class pingwin_game:
         self.E = exploration_constant
         self.B = bias_constant
         self.killer_rate=killer_rate
+        self.print_limit = print_limit
         self.board = initboard
         self.n_init=n_init
+        self.show_variation = show_variation
         self.searcher = mcts(initialState=self.board, timeLimit=self.time_limit * 1000, explorationConstant=self.E,
-                             biasConstant=self.B, n_init=self.n_init, killer_rate=self.killer_rate, simulation_depth=self.simulation_depth)
+                             biasConstant=self.B, n_init=self.n_init, killer_rate=self.killer_rate, simulation_depth=self.simulation_depth, print_limit=self.print_limit, show_variation=self.show_variation)
     def search_for_move(self):
         action = self.searcher.search()
         return action
@@ -32,6 +34,8 @@ class pingwin_game:
         print("Computer move: ")
         print(action.uci())
         print("")
+        with open('last_game_notation.txt', 'w') as f:
+            f.write(str(chess.Board().variation_san(self.board.move_stack)))
         return action.uci()
     def read_opponent_move(self,move):
         if move == None:
@@ -45,8 +49,6 @@ class pingwin_game:
             move = chess.Move.from_uci(move)
             subprocess.run('cls', shell=True)
         self.board.push(move)
-        with open('last_game_notation.txt', 'w') as f:
-            f.write(str(chess.Board().variation_san(self.board.move_stack)))
         for child_move, child_node in self.searcher.root.children.items():
             if child_move == move:
                 self.searcher.root = child_node

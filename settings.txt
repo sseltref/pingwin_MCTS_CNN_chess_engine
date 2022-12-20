@@ -1,7 +1,9 @@
-exploration_constant = 0.1
-bias_constant = 10
-killer_rate = 0
+exploration_constant = 1
+bias_constant = 1
+killer_rate = 0.5
 init_node_visits = 1
 simulation_depth = 0
-bias_neural_network = heavy
-position_eval_neural_network = heavy
+bias_neural_network = standard
+position_eval_neural_network = standard
+moves_print_limit = 100
+show_best_line = True
