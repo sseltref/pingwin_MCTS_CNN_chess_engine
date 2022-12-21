@@ -20,6 +20,7 @@ class mcts():
         self.simulation_depth=simulation_depth
         self.rollout = rolloutPolicy
         self.biasConstant = biasConstant
+        self.one_move_available = False
         self.killer_rate=killer_rate
         self.root = treeNode(initialState, None, 0, 0)
         self.print_limit=print_limit
@@ -76,6 +77,9 @@ class mcts():
         total_time = float(timeLimit) - float(time_start)
         i = 0
         t = 0
+        self.one_move_available = False
+        if len(list(self.root.board.legal_moves)) == 1:
+            self.one_move_available = True
         while time.time() < timeLimit:
             r = float(timeLimit) - float(time.time())
             r = r / total_time
@@ -84,7 +88,7 @@ class mcts():
             # self.explorationConstant = self.originalExplorationConstant * r
             self.branching_factor = r
             self.executeRound()
-            if len(list(self.root.board.legal_moves)) == 1:
+            if i == 100 and self.one_move_available:
                 return list(self.root.board.legal_moves)[0]
 
             if t < time_spent:
@@ -188,7 +192,7 @@ class mcts():
             if node.isFullyExpanded:
                 node = self.getBestChild(node, self.explorationConstant, self.biasConstant)
             else:
-                if node.add_node_picked:
+                if node.add_node_picked or self.one_move_available == True:
                     newNode = self.expand(node)
                     node.iterations_sice_expanded = 0
                     node = self.getBestChild(node, self.explorationConstant, self.biasConstant)
