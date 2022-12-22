@@ -1,6 +1,7 @@
 import keras
 import tensorflow
 import numpy as np
+import statistics
 settings_file = 'settings.txt'
 settings={}
 with open(settings_file) as f:
@@ -277,28 +278,33 @@ def MCMC(node, depth):
             reward = get_reward(node.board, turn)
         return reward
     else:
+        rewards = []
         turn = node.sideToMove
-        state = node.board
-        if not isTerminal(state):
-            i = 0
-            # until certain depth or terminal state is reached, do Markov Chain moves based on probability distribution given by CNN
-            # each move CNN has to be 2 times (to get the piece and then the move), therefore it needs a lot of computation
-            while not isTerminal(state) and i < depth:
-                action = generate_move(state)
-                move = chess.Move.from_uci(action)
-                state = copy.deepcopy(state)
-                state.push(move)
-                i += 1
-            if isTerminal(state):
-                # if terminal state has been reached, get the reward
-                reward = get_reward(state, turn)
+        for i in range (int(settings['number_of_simulations'])):
+            state = node.board
+            if not isTerminal(state):
+                i = 0
+                # until certain depth or terminal state is reached, do Markov Chain moves based on probability distribution given by CNN
+                # each move CNN has to be 2 times (to get the piece and then the move), therefore it needs a lot of computation
+                while not isTerminal(state) and i < depth:
+                    action = generate_move(state)
+                    move = chess.Move.from_uci(action)
+                    state = copy.deepcopy(state)
+                    state.push(move)
+                    i += 1
+                if isTerminal(state):
+                    # if terminal state has been reached, get the reward
+                    reward = get_reward(state, turn)
+                else:
+                    # pass the current state through CNN to get value of the position (% to win)
+                    legal_moves = list(state.legal_moves)
+                    reward = get_eval(split_dims(state, legal_moves))
+                if state.turn != turn:
+                    # swap the reward if the state was analysed from the opposite colour perspective
+                    reward = 1-reward
             else:
-                # pass the current state through CNN to get value of the position (% to win)
-                legal_moves = list(state.legal_moves)
-                reward = get_eval(split_dims(state, legal_moves))
-            if state.turn != turn:
-                # swap the reward if the state was analysed from the opposite colour perspective
-                reward = 1-reward
-        else:
-            reward = get_reward(node.board, turn)
+                reward = get_reward(node.board, turn)
+            #return reward
+            rewards.append(reward)
+        reward = statistics.mean(rewards)
         return reward

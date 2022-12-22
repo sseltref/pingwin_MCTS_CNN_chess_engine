@@ -81,12 +81,8 @@ class mcts():
         if len(list(self.root.board.legal_moves)) == 1:
             self.one_move_available = True
         while time.time() < timeLimit:
-            r = float(timeLimit) - float(time.time())
-            r = r / total_time
             time_left = (timeLimit-time.time())
             time_spent = self.timeLimit/1000 - time_left
-            # self.explorationConstant = self.originalExplorationConstant * r
-            self.branching_factor = r
             self.executeRound()
             if i == 100 and self.one_move_available:
                 return list(self.root.board.legal_moves)[0]
@@ -192,7 +188,7 @@ class mcts():
             if node.isFullyExpanded:
                 node = self.getBestChild(node, self.explorationConstant, self.biasConstant)
             else:
-                if node.add_node_picked or self.one_move_available == True:
+                if node.add_node_picked or self.one_move_available is True or node == self.root:
                     newNode = self.expand(node)
                     node.iterations_sice_expanded = 0
                     node = self.getBestChild(node, self.explorationConstant, self.biasConstant)
@@ -205,7 +201,7 @@ class mcts():
                 else:
                     node.iterations_sice_expanded += 1
                     node = self.getBestChild(node, self.explorationConstant, self.biasConstant)
-                    if node == node.parent.last_added_node or node.parent.iterations_sice_expanded > 1000:
+                    if node == node.parent.last_added_node or node.parent.iterations_sice_expanded > 0:
                         node.parent.add_node_picked = True
                         return node
         return node
