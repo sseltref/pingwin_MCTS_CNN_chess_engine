@@ -40,9 +40,11 @@ class mcts():
         childs = []
         for child in self.root.children.values():
             if child.numVisits != 0:
+                v = child.totalReward / child.numVisits
+                m = child.minmaxReward
+                killer_and_average = (1 - self.killer_rate) * v + self.killer_rate * m
                 childs.append((self.getAction(self.root, child).uci(),
-                               "score:" + '%.2f' % (((((1-self.killer_rate)*child.totalReward / child.numVisits)+self.killer_rate*child.minmaxReward)) * 100) + "%", "iterations: " + str(child.numVisits)))
-
+                               "score:" + '%.2f' % (((((1-self.killer_rate)*child.totalReward / child.numVisits)+self.killer_rate*child.minmaxReward)) * 100) + "%", "iterations: " + str(child.numVisits), child.move_bias, killer_and_average + 1 * (math.sqrt(self.root.numVisits) / child.numVisits) *child.move_bias ))
         childs = sorted(childs, key=lambda x: float(x[1][6:-1]), reverse=True)
         num_of_childs = len(childs)
         subprocess.run('cls', shell = True)
@@ -53,7 +55,7 @@ class mcts():
         print("Best moves:")
         for p in range (0,self.print_limit):
             if num_of_childs > p:
-                print("{}: ".format(p+1) + childs[p][0] , childs[p][1] , childs[p][2])
+                print("{}: ".format(p+1) + childs[p][0] , childs[p][1] , childs[p][2], childs[p][3], childs[p][4])
             else:
                 break
 
@@ -291,6 +293,8 @@ class mcts():
     def getBestChild(self, node, explorationValue, biasValue):
         bestValue = float("-inf")
         bestNodes = []
+        nodes = []
+        values = []
         for child in node.children.values():
             if child.numVisits == 0:
                 num_visits = 1
@@ -310,13 +314,23 @@ class mcts():
                 bias_equation = float("inf")
             else:
                 bias_equation = H*killer_and_average / (num_visits * (1 - killer_and_average))
-            nodeValue = killer_and_average + explorationValue * r + bias_equation*biasValue
-            if nodeValue > bestValue:
-                bestValue = nodeValue
-                bestNodes = [child]
-            elif nodeValue == bestValue:
-                bestNodes.append(child)
-        return random.choice(bestNodes)
+            #nodeValue = killer_and_average + explorationValue * r + bias_equation*biasValue
+            if node == self.root:
+                #nodeValue = killer_and_average + explorationValue * r
+                nodes.append(child)
+                values.append(killer_and_average + explorationValue * (math.sqrt(node_num_visits) / num_visits) *H)
+            else:
+                nodeValue = killer_and_average + explorationValue * (math.sqrt(node_num_visits) / num_visits) *H
+                if nodeValue > bestValue:
+                    bestValue = nodeValue
+                    bestNodes = [child]
+                elif nodeValue == bestValue:
+                    bestNodes.append(child)
+        if node == self.root:
+            values = values/sum(values)
+            return np.random.choice(nodes, p=values)
+        else:
+            return random.choice(bestNodes)
 
     def getBestChildLCB(self, node):
         bestValue = float("-inf")

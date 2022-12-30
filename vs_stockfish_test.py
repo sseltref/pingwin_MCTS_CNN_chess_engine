@@ -3,7 +3,7 @@ import chess
 import subprocess
 import gc
 from main import pingwin_game
-stockfish = Stockfish(path="C:/Users/Oliwia/PycharmProjects/chess_engine/stockfish_15_win_x64_avx2/stockfish_15_x64_avx2.exe", parameters={"Skill Level": 6})
+stockfish = Stockfish(path="C:/Users/Oliwia/PycharmProjects/chess_engine/stockfish_15_win_x64_avx2/stockfish_15_x64_avx2.exe", parameters={"Skill Level": 7})
 settings_file = 'settings.txt'
 settings={}
 with open(settings_file) as f:
