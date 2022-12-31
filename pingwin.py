@@ -8,7 +8,7 @@ with open(settings_file) as f:
         (key, val) = line.strip().split(' = ')
         settings[key] = val
 subprocess.run('cls', shell=True)
-initboard=chess.Board()
+initboard=chess.Board('1rbq1rk1/p1b1nppp/1p2p3/8/1B1pN3/P2B4/1P3PPP/2RQ1R1K w - -')
 print(initboard)
 time = int(input("Input time for computer move (in seconds): "))
 side = input("Do you want to play as white? (type yes or no): ")

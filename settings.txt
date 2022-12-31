@@ -1,6 +1,6 @@
 exploration_constant = 1
 bias_constant = 1
-killer_rate = 0
+killer_rate = 1
 init_node_visits = 1
 simulation_depth = 0
 number_of_simulations = 1

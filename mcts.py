@@ -318,19 +318,33 @@ class mcts():
             if node == self.root:
                 #nodeValue = killer_and_average + explorationValue * r
                 nodes.append(child)
-                values.append(killer_and_average + explorationValue * (math.sqrt(node_num_visits) / num_visits) *H)
+                values.append((killer_and_average + explorationValue * (math.sqrt(node_num_visits) / num_visits)*0.1)**100)
             else:
-                nodeValue = killer_and_average + explorationValue * (math.sqrt(node_num_visits) / num_visits) *H
+                '''nodeValue = killer_and_average + explorationValue * (math.sqrt(node_num_visits) / num_visits) *H
                 if nodeValue > bestValue:
                     bestValue = nodeValue
                     bestNodes = [child]
                 elif nodeValue == bestValue:
-                    bestNodes.append(child)
+                    bestNodes.append(child)'''
+                nodes.append(child)
+                values.append(
+                    (killer_and_average + explorationValue * (math.sqrt(node_num_visits) / num_visits) * H) ** 10)
+                #values.append(
+                    #(killer_and_average + 0.1 * r) ** 100)
+
         if node == self.root:
-            values = values/sum(values)
-            return np.random.choice(nodes, p=values)
+            summed = sum(values)
+            norm_values =[]
+            for v in values:
+                norm_values.append(v/summed)
+            return np.random.choice(nodes, p=norm_values)
         else:
-            return random.choice(bestNodes)
+            #return random.choice(bestNodes)
+            summed = sum(values)
+            norm_values = []
+            for v in values:
+                norm_values.append(v / summed)
+            return np.random.choice(nodes, p=norm_values)
 
     def getBestChildLCB(self, node):
         bestValue = float("-inf")
@@ -344,6 +358,7 @@ class mcts():
             r = (1-self.killer_rate) * (child.totalReward / child.numVisits) + self.killer_rate * child.minmaxReward
             v=r - self.explorationConstant * math.sqrt(2 * math.log(node.numVisits) / visits)
             nodeValue = v
+            #nodeValue = visits
 
             if nodeValue > bestValue:
                 bestValue = nodeValue

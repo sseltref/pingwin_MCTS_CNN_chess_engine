@@ -2,8 +2,10 @@ from stockfish import Stockfish
 import chess
 import subprocess
 import gc
+import random
 from main import pingwin_game
-stockfish = Stockfish(path="C:/Users/Oliwia/PycharmProjects/chess_engine/stockfish_15_win_x64_avx2/stockfish_15_x64_avx2.exe", parameters={"Skill Level": 7})
+stockfish = Stockfish(path="C:/Users/Oliwia/PycharmProjects/chess_engine/stockfish_15_win_x64_avx2/stockfish_15_x64_avx2.exe", parameters={ "UCI_LimitStrength": "true",
+    "UCI_Elo": 1800})
 settings_file = 'settings.txt'
 settings={}
 with open(settings_file) as f:
