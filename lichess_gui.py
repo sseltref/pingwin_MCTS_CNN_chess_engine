@@ -81,7 +81,7 @@ class Game():
         elif self.pingwin.moves_made<31:
             move_time = (self.limit*0.3)/15 + self.increment
         else:
-            move_time = time_left*0.1 + self.increment*0.5
+            move_time = time_left*0.1
 
         move = self.pingwin.make_move(move_time)
         client.bots.make_move(self.game_id, move)

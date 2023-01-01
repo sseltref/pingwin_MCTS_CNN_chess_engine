@@ -154,6 +154,9 @@ class mcts():
             if self.bestChildVisit == self.bestChildLCB:
                 self.panic = False
                 return self.getAction(self.root, self.bestChildVisit)
+            if self.root.totalReward/self.root.numVisits < 0.01:
+                self.bestChildKiller = self.getBestChildKiller(self.root)
+                return self.getAction(self.root, self.bestChildKiller)
             i+=1
         '''if self.bestChildVisit!=self.bestChildAverage or self.bestChildVisit!=self.bestChildKiller or self.bestChildAverage !=self.bestChildKiller:
                 print('overtime')
@@ -189,7 +192,16 @@ class mcts():
         self.backpropagate_minmax(node, reward)
 
     def selectNode(self, node):
+        possible_draw = False
+        if self.root.numVisits > 0:
+            if self.root.totalReward / self.root.numVisits < 0.01:
+                possible_draw = True
         while not node.isTerminal:
+            if possible_draw == True:
+                if node.parent.parent == self.root or node.parent == self.root:
+                    if node.board.can_claim_threefold_repetition():
+                        node.isTerminal = True
+                        node.minmaxReward = 0.5
             if node.isFullyExpanded:
                 node = self.getBestChild(node, self.explorationConstant, self.biasConstant)
             else:
@@ -325,10 +337,7 @@ class mcts():
                     nodes.append(child)
                     values.append((killer_and_average + explorationValue * (math.sqrt(node_num_visits) / num_visits)*0.1)**100)
                 else:
-                    if v>0.99:
-                        nodeValue = m
-                    else:
-                        nodeValue = killer_and_average
+                    nodeValue = killer_and_average
                     if nodeValue > bestValue:
                         bestValue = nodeValue
                         bestNodes = [child]
@@ -351,7 +360,7 @@ class mcts():
                     #values.append(
                         #(killer_and_average + 0.1 * r) ** 100)
         if self.panic == True and node == self.root:
-            return np.random.choice(bestNodes)
+            return bestNodes[0]
 
         if node == self.root:
             summed = sum(values)
@@ -415,7 +424,8 @@ class mcts():
         bestValue = float("-inf")
         bestNodes = []
         for child in node.children.values():
-            nodeValue = child.minmaxReward - self.explorationConstant * math.sqrt(2 * math.log(node.numVisits) / child.numVisits)
+            #nodeValue = child.minmaxReward - self.explorationConstant * math.sqrt(2 * math.log(node.numVisits) / child.numVisits)
+            nodeValue = child.minmaxReward
             if nodeValue > bestValue:
                 bestValue = nodeValue
                 bestNodes = [child]
