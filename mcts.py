@@ -156,6 +156,7 @@ class mcts():
                 return self.getAction(self.root, self.bestChildVisit)
             if self.root.totalReward/self.root.numVisits < 0.01:
                 self.bestChildKiller = self.getBestChildKiller(self.root)
+                self.bestChildVisit = self.getBestChildKiller(self.root)
                 return self.getAction(self.root, self.bestChildKiller)
             i+=1
         '''if self.bestChildVisit!=self.bestChildAverage or self.bestChildVisit!=self.bestChildKiller or self.bestChildAverage !=self.bestChildKiller:
@@ -198,10 +199,17 @@ class mcts():
                 possible_draw = True
         while not node.isTerminal:
             if possible_draw == True:
-                if node.parent.parent == self.root or node.parent == self.root:
+                if node.parent is not None:
+                    if node.parent.parent == self.root:
+                        if node.board.can_claim_threefold_repetition():
+                            node.isTerminal = True
+                            node.minmaxReward = 0.5
+                            return node
+                if  node.parent == self.root:
                     if node.board.can_claim_threefold_repetition():
                         node.isTerminal = True
                         node.minmaxReward = 0.5
+                        return node
             if node.isFullyExpanded:
                 node = self.getBestChild(node, self.explorationConstant, self.biasConstant)
             else:

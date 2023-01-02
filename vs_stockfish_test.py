@@ -17,7 +17,7 @@ subprocess.run('cls', shell=True)
 #move = chess.Move.from_uci(move)
 #initboard.push(move)
 elo = 1800
-number=0
+number=33
 while True:
     try:
         stockfish = Stockfish(
@@ -46,7 +46,7 @@ while True:
                 break
             if chess_game.board.is_checkmate() == True:
                 result = 'win'
-                elo+=50
+                elo+=100
                 break
             board_fen = chess_game.board.fen()
             stockfish.set_fen_position(board_fen)
@@ -54,10 +54,10 @@ while True:
             chess_game.read_opponent_move(stockfish_move)
             if chess_game.board.is_checkmate() == True:
                 result = 'loss'
-                elo-=50
+                elo-=100
                 break
         number+=1
-        with open('experiment/elo{}_{}_{}_{}.txt'.format(new_elo, result,color,number), 'w') as f:
+        with open('experiment_10_sek/elo{}_{}_{}_{}.txt'.format(new_elo, result,color,number), 'w') as f:
             f.write(str(chess.Board().variation_san(chess_game.board.move_stack)))
     except:
         print('error')
