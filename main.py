@@ -15,6 +15,8 @@ class pingwin_game:
         self.killer_rate=killer_rate
         self.print_limit = print_limit
         self.board = initboard
+        self.is_winning = False
+        self.is_losing = False
         self.n_init=n_init
         self.show_variation = show_variation
         self.searcher = mcts(initialState=self.board, timeLimit=self.time_limit * 1000, explorationConstant=self.E,
@@ -36,6 +38,8 @@ class pingwin_game:
         print("")
         with open('last_game_notation.txt', 'w') as f:
             f.write(str(chess.Board().variation_san(self.board.move_stack)))
+        self.is_winning=self.searcher.is_winning
+        self.is_losing = self.searcher.is_losing
         return action.uci()
     def read_opponent_move(self,move):
         if move == None:

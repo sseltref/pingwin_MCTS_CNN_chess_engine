@@ -25,6 +25,8 @@ class mcts():
         self.root = treeNode(initialState, None, 0, 0)
         self.print_limit=print_limit
         self.panic = False
+        self.is_winning = False
+        self.is_losing = False
         if show_variation == "True":
             self.show_variation = True
         else:
@@ -133,7 +135,10 @@ class mcts():
                     if max_lcb > max_ucb:
                         break'''
             i += 1
-
+        if self.root.totalReward / self.root.numVisits < 0.01:
+            self.is_winning=True
+        if self.root.totalReward / self.root.numVisits > 0.90:
+            self.is_losing=True
         self.bestChild = self.getBestChild(self.root, 0, 0)
         self.bestChildVisit = self.getBestChildVisit(self.root)
         self.bestChildLCB = self.getBestChildLCB(self.root)
@@ -204,12 +209,15 @@ class mcts():
                         if node.board.can_claim_threefold_repetition():
                             node.isTerminal = True
                             node.minmaxReward = 0.5
+                            node.minmaxReward = 1
+                            node.numVisits = 10
                             return node
                 if  node.parent == self.root:
                     if node.board.can_claim_threefold_repetition():
                         node.isTerminal = True
                         node.minmaxReward = 0.5
-                        return node
+                        self.backpropagate_minmax(node, 0.5)
+                        node = self.getBestChild(self.root, self.explorationConstant, self.biasConstant)
             if node.isFullyExpanded:
                 node = self.getBestChild(node, self.explorationConstant, self.biasConstant)
             else:
