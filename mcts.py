@@ -58,7 +58,7 @@ class mcts():
         print("Best moves:")
         for p in range (0,self.print_limit):
             if num_of_childs > p:
-                print("{}: ".format(p+1) + childs[p][0] , childs[p][1] , childs[p][2], childs[p][3], childs[p][4])
+                print("{}: ".format(p+1) + childs[p][0] , childs[p][1] , childs[p][2])
             else:
                 break
 
@@ -137,7 +137,7 @@ class mcts():
             i += 1
         if self.root.totalReward / self.root.numVisits < 0.01:
             self.is_winning=True
-        if self.root.totalReward / self.root.numVisits > 0.90:
+        if self.root.totalReward / self.root.numVisits > 0.99:
             self.is_losing=True
         self.bestChild = self.getBestChild(self.root, 0, 0)
         self.bestChildVisit = self.getBestChildVisit(self.root)
@@ -198,12 +198,12 @@ class mcts():
         self.backpropagate_minmax(node, reward)
 
     def selectNode(self, node):
-        possible_draw = False
+        #possible_draw = False
         if self.root.numVisits > 0:
-            if self.root.totalReward / self.root.numVisits < 0.01:
-                possible_draw = True
+            '''if self.root.totalReward / self.root.numVisits < 0.01:
+                possible_draw = True'''
         while not node.isTerminal:
-            if possible_draw == True:
+            '''if possible_draw == True:
                 if node.parent is not None:
                     if node.parent.parent == self.root:
                         if node.board.can_claim_threefold_repetition():
@@ -217,7 +217,7 @@ class mcts():
                         node.isTerminal = True
                         node.minmaxReward = 0.5
                         self.backpropagate_minmax(node, 0.5)
-                        node = self.getBestChild(self.root, self.explorationConstant, self.biasConstant)
+                        node = self.getBestChild(self.root, self.explorationConstant, self.biasConstant)'''
             if node.isFullyExpanded:
                 node = self.getBestChild(node, self.explorationConstant, self.biasConstant)
             else:
@@ -372,7 +372,7 @@ class mcts():
                                 math.sqrt(node_num_visits) / num_visits) * 0.1) ** 100)
                 else:
                     values.append(
-                        (killer_and_average + explorationValue * (math.sqrt(node_num_visits) / num_visits) * H) ** 10)
+                            (killer_and_average + explorationValue * (math.sqrt(node_num_visits) / num_visits) * H) ** 10)
                     #values.append(
                         #(killer_and_average + 0.1 * r) ** 100)
         if self.panic == True and node == self.root:
@@ -396,18 +396,18 @@ class mcts():
         bestValue = float("-inf")
         bestNodes = []
         for child in node.children.values():
-            if (child.totalReward / child.numVisits) > 0.99:
-                v = child.minmaxReward
-            else:
-                #v = child.numVisits
-                visits = child.numVisits
-                if visits == 0:
-                    visits =1
-                #v = (child.totalReward / visits)-math.sqrt(2 * math.log(node.numVisits) / visits)
-                r = (1-self.killer_rate) * (child.totalReward / child.numVisits) + self.killer_rate * child.minmaxReward
-                v = r - self.explorationConstant * math.sqrt(2 * math.log(node.numVisits) / visits)
-                if r>0.99:
-                    v = child.minmaxReward
+            #if (child.totalReward / child.numVisits) > 0.99:
+                #v = child.minmaxReward
+            #else:
+            #v = child.numVisits
+            visits = child.numVisits
+            if visits == 0:
+                visits =1
+            #v = (child.totalReward / visits)-math.sqrt(2 * math.log(node.numVisits) / visits)
+            r = (1-self.killer_rate) * (child.totalReward / child.numVisits) + self.killer_rate * child.minmaxReward
+            v = r - self.explorationConstant * math.sqrt(2 * math.log(node.numVisits) / visits)
+            #if r>0.99:
+                #v = child.minmaxReward
             nodeValue = v
             #nodeValue = visits
 
