@@ -43,7 +43,7 @@ class mcts():
                 childs.append((self.getAction(self.root, child).uci(),
                                "score:" + '%.2f' % (((((1-self.killer_rate)*child.totalReward / child.numVisits)+self.killer_rate*child.minmaxReward)) * 100) + "%", "iterations: " + str(child.numVisits)))
 
-        childs = sorted(childs, key=lambda x: float(x[1][6:-1]), reverse=True)
+        childs = sorted(childs, key=lambda x: float(x[2][12:]), reverse=True)
         num_of_childs = len(childs)
         subprocess.run('cls', shell = True)
         print(board)
@@ -92,64 +92,8 @@ class mcts():
                 self.bestChildLCB = self.getBestChildLCB(self.root)
                 self.print_analysis(self.root.board,timeLimit-time.time())
                 t+=1
-                #while node.num_children != 0:
-                    #variation.append((self.getAction(node, self.getBestChild(node,0,self.biasConstant))).uci())
-                    #node = self.getBestChildVisit(node)
-
-                #print(variation)
-                '''aux_node = self.root
-                while aux_node.num_children != 0:
-                    best_child_childs = []
-                    best_child = self.getBestChildVisit(aux_node)
-                    for child in best_child.children.values():
-                        if child.numVisits != 0:
-                            nodeValue = child.totalReward / child.numVisits
-                            best_child_childs.append((self.getAction(best_child, child).uci(),
-                                                      '%.0f' % (nodeValue * 100) + "%", child.numVisits,  '%.0f' % (child.minmaxReward * 100)))
-                    childs = sorted(best_child_childs, key=lambda x: float(x[2]), reverse=True)
-                    print("child: ", i, childs)
-                    aux_node = best_child'''
-                # self.bestChild = self.getBestChild(self.root, 0 ,0)
-                # visits = self.bestChild.numVisits
-                # print(visits)
-                # if visits == prev_visits + 1000:
-                # break
-                # prev_visits = visits
-                '''if self.root.num_children>1:
-                    childs = []
-                    for child in self.root.children.values():
-                        r = math.sqrt(2 * math.log(self.root.numVisits) / child.numVisits)
-                        child_ucb = child.totalReward / child.numVisits + self.explorationConstant * r
-                        child_lcb = child.totalReward / child.numVisits - self.explorationConstant * r
-                        childs.append([child_ucb, child_lcb])
-                    childs = sorted(childs, key=lambda x: float(x[1]), reverse=True)
-                    max_lcb = childs[0][1]
-                    childs.pop(0)
-                    childs = sorted(childs, key=lambda x: float(x[0]), reverse=True)
-                    max_ucb = childs[0][0]
-                    if max_lcb > max_ucb:
-                        break'''
             i += 1
-
-        self.bestChild = self.getBestChild(self.root, 0, 0)
-        self.bestChildVisit = self.getBestChildVisit(self.root)
-        self.bestChildLCB = self.getBestChildLCB(self.root)
-        if self.bestChildVisit!=self.bestChildLCB:
-            print('overtime')
-            new_children = {action: child for action,child in self.root.children.items() if child == self.bestChildLCB or child == self.bestChildVisit}
-            self.root.children = new_children
-            gc.collect()
-        else:
-            return self.getAction(self.root, self.bestChildLCB)
-        while True:
-            #if i % 10000 == 0:
-                #print('visit: ' +  str(self.getAction(self.root, self.bestChildVisit)), 'LCB: ' + str(self.getAction(self.root, self.bestChildLCB)))
-            self.executeRound()
-            self.bestChildVisit = self.getBestChildVisit(self.root)
-            self.bestChildLCB = self.getBestChildLCB(self.root)
-            if self.bestChildVisit == self.bestChildLCB:
-                return self.getAction(self.root, self.bestChildVisit)
-            i+=1
+        return self.getAction(self.root, self.bestChildVisit)
         '''if self.bestChildVisit!=self.bestChildAverage or self.bestChildVisit!=self.bestChildKiller or self.bestChildAverage !=self.bestChildKiller:
                 print('overtime')
                 new_children = {action: child for action,child in self.root.children.items() if child == self.bestChildAverage or child == self.bestChildVisit or child == self.bestChildKiller}
@@ -305,12 +249,7 @@ class mcts():
             m = child.minmaxReward
             r = math.sqrt(2 * math.log(node_num_visits) / num_visits)
             H = child.move_bias
-            killer_and_average = (1-self.killer_rate)*v + self.killer_rate*m
-            if killer_and_average == 1:
-                bias_equation = float("inf")
-            else:
-                bias_equation = H*killer_and_average / (num_visits * (1 - killer_and_average))
-            nodeValue = killer_and_average + explorationValue * r + bias_equation*biasValue
+            nodeValue = v + H*(math.sqrt(node_num_visits)/num_visits)
             if nodeValue > bestValue:
                 bestValue = nodeValue
                 bestNodes = [child]
