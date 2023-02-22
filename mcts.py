@@ -24,6 +24,9 @@ class mcts():
         self.killer_rate=killer_rate
         self.root = treeNode(initialState, None, 0, 0)
         self.print_limit=print_limit
+        self.panic = False
+        self.is_winning = False
+        self.is_losing = False
         if show_variation == "True":
             self.show_variation = True
         else:
@@ -40,6 +43,9 @@ class mcts():
         childs = []
         for child in self.root.children.values():
             if child.numVisits != 0:
+                v = child.totalReward / child.numVisits
+                m = child.minmaxReward
+                killer_and_average = (1 - self.killer_rate) * v + self.killer_rate * m
                 childs.append((self.getAction(self.root, child).uci(),
                                "score:" + '%.2f' % (((((1-self.killer_rate)*child.totalReward / child.numVisits)+self.killer_rate*child.minmaxReward)) * 100) + "%", "iterations: " + str(child.numVisits)))
 
@@ -93,6 +99,7 @@ class mcts():
                 self.print_analysis(self.root.board,timeLimit-time.time())
                 t+=1
             i += 1
+
         return self.getAction(self.root, self.bestChildVisit)
         '''if self.bestChildVisit!=self.bestChildAverage or self.bestChildVisit!=self.bestChildKiller or self.bestChildAverage !=self.bestChildKiller:
                 print('overtime')
@@ -128,7 +135,26 @@ class mcts():
         self.backpropagate_minmax(node, reward)
 
     def selectNode(self, node):
+        #possible_draw = False
+        if self.root.numVisits > 0:
+            '''if self.root.totalReward / self.root.numVisits < 0.01:
+                possible_draw = True'''
         while not node.isTerminal:
+            '''if possible_draw == True:
+                if node.parent is not None:
+                    if node.parent.parent == self.root:
+                        if node.board.can_claim_threefold_repetition():
+                            node.isTerminal = True
+                            node.minmaxReward = 0.5
+                            node.minmaxReward = 1
+                            node.numVisits = 10
+                            return node
+                if  node.parent == self.root:
+                    if node.board.can_claim_threefold_repetition():
+                        node.isTerminal = True
+                        node.minmaxReward = 0.5
+                        self.backpropagate_minmax(node, 0.5)
+                        node = self.getBestChild(self.root, self.explorationConstant, self.biasConstant)'''
             if node.isFullyExpanded:
                 node = self.getBestChild(node, self.explorationConstant, self.biasConstant)
             else:
@@ -149,6 +175,7 @@ class mcts():
                         node.parent.add_node_picked = True
                         return node
         return node
+
 
     def expand(self,node):
         #pick the from square (piece) we are going to expand by selecting the highest value from the list of values of available moves dictionary in node position
@@ -235,6 +262,8 @@ class mcts():
     def getBestChild(self, node, explorationValue, biasValue):
         bestValue = float("-inf")
         bestNodes = []
+        nodes = []
+        values = []
         for child in node.children.values():
             if child.numVisits == 0:
                 num_visits = 1
@@ -261,14 +290,20 @@ class mcts():
         bestValue = float("-inf")
         bestNodes = []
         for child in node.children.values():
+            #if (child.totalReward / child.numVisits) > 0.99:
+                #v = child.minmaxReward
+            #else:
             #v = child.numVisits
             visits = child.numVisits
             if visits == 0:
                 visits =1
             #v = (child.totalReward / visits)-math.sqrt(2 * math.log(node.numVisits) / visits)
             r = (1-self.killer_rate) * (child.totalReward / child.numVisits) + self.killer_rate * child.minmaxReward
-            v=r - self.explorationConstant * math.sqrt(2 * math.log(node.numVisits) / visits)
+            v = r - self.explorationConstant * math.sqrt(2 * math.log(node.numVisits) / visits)
+            #if r>0.99:
+                #v = child.minmaxReward
             nodeValue = v
+            #nodeValue = visits
 
             if nodeValue > bestValue:
                 bestValue = nodeValue
@@ -299,7 +334,8 @@ class mcts():
         bestValue = float("-inf")
         bestNodes = []
         for child in node.children.values():
-            nodeValue = child.minmaxReward - self.explorationConstant * math.sqrt(2 * math.log(node.numVisits) / child.numVisits)
+            #nodeValue = child.minmaxReward - self.explorationConstant * math.sqrt(2 * math.log(node.numVisits) / child.numVisits)
+            nodeValue = child.minmaxReward
             if nodeValue > bestValue:
                 bestValue = nodeValue
                 bestNodes = [child]

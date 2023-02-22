@@ -6,5 +6,5 @@ simulation_depth = 0
 number_of_simulations = 1
 bias_neural_network = heavy
 position_eval_neural_network = heavy
-moves_print_limit = 100
-show_best_line = True
+moves_print_limit = 5
+show_best_line = False
