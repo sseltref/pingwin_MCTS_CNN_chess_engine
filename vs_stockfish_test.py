@@ -21,7 +21,7 @@ number=0
 while True:
     try:
         stockfish = Stockfish(
-            path="C:/Users/Oliwia/PycharmProjects/chess_engine/stockfish_15_win_x64_avx2/stockfish_15_x64_avx2.exe",
+            path="",
             parameters={"UCI_LimitStrength": "true",
                         "UCI_Elo": elo})
         result = 'playing'

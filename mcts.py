@@ -101,31 +101,6 @@ class mcts():
             i += 1
 
         return self.getAction(self.root, self.bestChildVisit)
-        '''if self.bestChildVisit!=self.bestChildAverage or self.bestChildVisit!=self.bestChildKiller or self.bestChildAverage !=self.bestChildKiller:
-                print('overtime')
-                new_children = {action: child for action,child in self.root.children.items() if child == self.bestChildAverage or child == self.bestChildVisit or child == self.bestChildKiller}
-                self.root.children = new_children
-                gc.collect()
-        else:
-            return self.getAction(self.root, self.bestChildVisit)
-        while True:
-            #if i % 10000 == 0:
-                 #print('visit: ' +  str(self.getAction(self.root, self.bestChildVisit)), 'LCB: ' + str(self.getAction(self.root, self.bestChildLCB)))
-            self.executeRound()
-            self.bestChildVisit = self.getBestChildVisit(self.root)
-            self.bestChildAverage = self.getBestChildAverage(self.root)
-            self.bestChildKiller = self.getBestChildKiller(self.root)
-            if self.bestChildVisit == self.bestChildAverage or self.bestChildVisit == self.bestChildKiller or self.bestChildAverage == self.bestChildKiller:
-                new_children = {action: child for action,child in self.root.children.items() if child == self.bestChildAverage or child == self.bestChildVisit or child == self.bestChildKiller}
-                self.root.children = new_children
-                gc.collect()
-                while True:
-                    self.executeRound()
-                    self.bestChildVisit = self.getBestChildVisit(self.root)
-                    self.bestChildAverage = self.getBestChildAverage(self.root)
-                    self.bestChildKiller = self.getBestChildKiller(self.root)
-                    if self.bestChildVisit == self.bestChildAverage and self.bestChildVisit == self.bestChildKiller and self.bestChildAverage == self.bestChildKiller:
-                        return self.getAction(self.root, self.bestChildVisit)'''
 
 
     def executeRound(self):
